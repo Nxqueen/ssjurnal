@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/scrape",
+      "dest": "/api/scrape.py",
+      "methods": ["GET", "POST"]
+    },
+    {
+      "src": "/api/health",
+      "dest": "/api/health.py",
+      "methods": ["GET"]
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/scrape",
+      "schedule": "0 */6 * * *"
+    }
+  ],
+  "functions": {
+    "api/scrape.py": {
+      "maxDuration": 60,
+      "memory": 512
+    },
+    "api/health.py": {
+      "maxDuration": 10,
+      "memory": 128
+    }
+  },
+  "env": {
+    "SINTA_RANK": "2",
+    "SCRAPE_LIMIT": "10"
+  }
+}

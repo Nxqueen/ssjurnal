@@ -1,0 +1,10 @@
+# === SCRAPING (Lightweight — NO Selenium/Playwright) ===
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# === DATABASE (Supabase/PostgreSQL) ===
+supabase==2.10.0
+
+# === UTILITY ===
+python-dotenv==1.0.1
