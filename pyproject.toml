@@ -1,2 +1,2 @@
 [tool.vercel]
-entrypoint = "api/scrape.py"
+entrypoint = "api.scrape:handler"
