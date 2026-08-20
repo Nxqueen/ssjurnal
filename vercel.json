@@ -2,18 +2,12 @@
   "version": 2,
   "functions": {
     "api/scrape.py": {
-      "maxDuration": 60,
+      "maxDuration": 10,
       "memory": 512
     },
     "api/health.py": {
       "maxDuration": 10,
       "memory": 128
     }
-  },
-  "crons": [
-    {
-      "path": "/api/scrape",
-      "schedule": "0 */6 * * *"
-    }
-  ]
+  }
 }
