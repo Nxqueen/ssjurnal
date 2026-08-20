@@ -1,2 +1,11 @@
+[project]
+name = "ssjurnal"
+version = "0.1.0"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "supabase"
+]
+
 [tool.vercel]
 entrypoint = "api.scrape:handler"
