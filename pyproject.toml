@@ -1,11 +1,31 @@
-[project]
-name = "ssjurnal"
-version = "0.1.0"
-dependencies = [
-    "requests",
-    "beautifulsoup4",
-    "supabase"
-]
+name: SINTA Scraper Cron
 
-[tool.vercel]
-entrypoint = "api.scrape:handler"
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Berjalan setiap 6 jam
+  workflow_dispatch:      # Tombol run manual di GitHub
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests beautifulsoup4 supabase
+
+      - name: Run Python Scraper
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SINTA_RANK: "2"
+          SCRAPE_LIMIT: "10"
+        run: |
+          python api/scrape.py
