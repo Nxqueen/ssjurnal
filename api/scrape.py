@@ -5,13 +5,6 @@ Author  : Senior Python Backend Developer
 Target  : sinta.kemdiktisaintek.go.id  (domain baru per 2025)
 Schedule: Every 6 hours via Vercel Cron Jobs / GitHub Actions
 Strategy: requests + BeautifulSoup (html.parser) — NO Selenium/Playwright
-
-PERUBAHAN DARI VERSI LAMA:
-- Domain: kemdikbud.go.id → kemdiktisaintek.go.id
-- Path: /journals → /journals/index/
-- Pagination: ?page=N  (filter rank via URL tidak didukung server, pakai JS)
-- Selector: diperbarui sesuai struktur HTML aktual SINTA
-- Rank filter: dilakukan sisi scraper (parse teks "S2 Accredited" dari HTML)
 """
 
 from __future__ import annotations
@@ -46,7 +39,7 @@ class Config:
     # Filter ranking SINTA: 1 | 2 | 3 | 4 | 5 | 6
     SINTA_RANK: int = int(os.getenv("SINTA_RANK", "2"))
 
-    # Berapa jurnal yang diambil per eksekusi (Dibuat 5 default agar aman dari timeout 10 detik Vercel Free)
+    # Berapa jurnal yang diambil per eksekusi
     SCRAPE_LIMIT: int = int(os.getenv("SCRAPE_LIMIT", "5"))
 
     # Timeout koneksi + baca dipercepat agar aman di Vercel Free Plan (10 detik limit)
@@ -242,7 +235,7 @@ class SintaScraper:
     def scrape(self) -> list[dict[str, Any]]:
         collected: list[dict[str, Any]] = []
         page = 1
-        MAX_PAGES = 50  # Dibatasi agar tidak kena timeout di Vercel Free
+        MAX_PAGES = 50
 
         while len(collected) < self.cfg.SCRAPE_LIMIT and page <= MAX_PAGES:
             batch = self._fetch_page(page)
@@ -361,7 +354,10 @@ class handler(BaseHTTPRequestHandler):
         )
 
         scraper = SintaScraper()
+        html_debug = ""
         try:
+            url = f"{scraper.cfg.SINTA_BASE}{scraper.cfg.SINTA_JOURNAL_PATH}"
+            html_debug = scraper._get(url) or "Gagal fetch"
             journals = scraper.scrape()
         except Exception as exc:
             log.exception("Unhandled scraper error")
@@ -386,6 +382,7 @@ class handler(BaseHTTPRequestHandler):
             "db_inserted": db_result.get("inserted", 0),
             "db_errors": db_result.get("errors", []),
             "elapsed_seconds": elapsed,
+            "html_preview": html_debug[:300],  # ← Preview HTML untuk debugging di GitHub Actions
             "journals": journals,
         }
 
