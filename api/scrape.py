@@ -394,3 +394,20 @@ class handler(BaseHTTPRequestHandler):
         )
 
         self._send_json(200, response_body)
+
+# ═══════════════════════════════════════════════
+# 6. LOCAL CLI EXECUTION (untuk GitHub Actions)
+# ═══════════════════════════════════════════════
+if __name__ == "__main__":
+    print("=== Menjalankan SINTA Scraper via GitHub Actions ===")
+    scraper = SintaScraper()
+    try:
+        journals = scraper.scrape()
+        print(f"Berhasil men-scrape {len(journals)} jurnal.")
+        
+        db = DatabaseManager()
+        db_result = db.upsert(journals)
+        print(f"Hasil simpan ke Supabase: {db_result}")
+    except Exception as e:
+        print(f"Error saat scraping: {e}")
+        exit(1)
